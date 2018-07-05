@@ -6,10 +6,6 @@
 #------------------------------------------------
 
 FLINK_DIR='/usr/local/opt/flink'
-# pip uninstall zc.buildout
-# pip3 uninstall zc.buildout
-# pip install setuptools
-# pip3 install setuptools
 
 rm -rf src/*.egg-info
 rm -rf parts/*

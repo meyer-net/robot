@@ -16,4 +16,7 @@ class Base(SourceBase):
         path = self._conf["path"]
         ref = self._conf["ref"]
         return "{}/{}.position".format(path, ref)
-        
+
+    def restore_hung_up(self, handler, ctx):
+        '''IO流可以通过行号跟offset去定位最后读取的位置，所以不用实现'''
+        pass

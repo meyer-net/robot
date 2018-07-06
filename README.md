@@ -4,11 +4,16 @@ It is usually used for multi-dimensional data high concurrency analysis scenario
 
 - setup step 
 ```
-quick:
+first-boot:
 {
     vim build.sh //edit your flink setup path
     chmod +x build.sh
     ./build.sh
+}
+
+start-boot:
+{
+    $SANDBOX_FILE src/boot.py "$FLINK_DIR/bin/pyflink-stream.sh"
 }
 
 build-env:

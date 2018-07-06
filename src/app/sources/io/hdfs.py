@@ -35,9 +35,6 @@ class Hdfs(SourceIOBase):
             self.logger.error("Read position from file '{}' error -> {}".format(position_path, err))
 
         return position
-        
-    def restore_hung_up(self, handler, ctx):
-        pass
 
     def get_handler(self):
         args = self._conf 
@@ -56,7 +53,6 @@ class Hdfs(SourceIOBase):
         # with client.read(filename, encoding='utf-8', delimiter='\n') as reader:
         #     for line in reader:
         #         print(line.strip())
-        self.set_position(handler, 0)
         offset = self.get_position(handler)
         
         #93412555
@@ -73,9 +69,7 @@ class Hdfs(SourceIOBase):
                     offset += len(line+'\n')
                         
                     self.logger.debug("Ref operator of '{}'(Reading io '{}/{}' from file '{}', offset='{}')".format(ref, index+1, lines_len, read_file, offset))
-                
-                # offset -= 1  # 因换行符缘故，偏移位回退一位
-                
+                                
         except HdfsDriver.HdfsIOException as err:  
             self.logger.info("Ref operator of '{}' raise err({}), read break".format(ref, err, read_file))
             return
@@ -84,4 +78,3 @@ class Hdfs(SourceIOBase):
             self.logger.error("Ref operator of '{}' raise err({}) from file '{}', read break".format(ref, err, read_file))
         
         return offset
-        # client.append('{path}/{formated}'.format(**args), self.lastline)

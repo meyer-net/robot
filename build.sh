@@ -23,8 +23,8 @@ fi
 
 python3 bootstrap.py && bin/buildout
 
-RUNNER_DIR=`pwd`
-RUNNER_FILE=$RUNNER_DIR/bin/sandbox
+ENV_DIR=`pwd`
+SANDBOX_FILE=$ENV_DIR/bin/sandbox
 
 function convert_module()
 {
@@ -39,12 +39,13 @@ function convert_module()
 	return $?
 }
 
-if [ -f $RUNNER_FILE ]; then
-    sed -i "5a  \'$RUNNER_DIR/src/app\'," $RUNNER_FILE
-    sed -i "s@sys\.path\[0\:0\]@packages@g" $RUNNER_FILE
-    PATH_END_LINE=`awk '/]/ {print NR}' $RUNNER_FILE | awk 'NR==1{print}'`
-    sed -i "$((PATH_END_LINE+1))a sys.path[0:0] = packages" $RUNNER_FILE
-    sed -i "$((PATH_END_LINE+2))a sys.argv.append(packages)" $RUNNER_FILE
+if [ -f $SANDBOX_FILE ]; then
+    echo "INFO: Start to change environment by file '$SANDBOX_FILE' and 'eggs/*'."
+    sed -i "5a  \'$ENV_DIR/src/app\'," $SANDBOX_FILE
+    sed -i "s@sys\.path\[0\:0\]@packages@g" $SANDBOX_FILE
+    PATH_END_LINE=`awk '/]/ {print NR}' $SANDBOX_FILE | awk 'NR==1{print}'`
+    sed -i "$((PATH_END_LINE+1))a sys.path[0:0] = packages" $SANDBOX_FILE
+    sed -i "$((PATH_END_LINE+2))a sys.argv.append(packages)" $SANDBOX_FILE
 
     # six 模块 没有__init__.py
     convert_module "six"
@@ -52,11 +53,9 @@ if [ -f $RUNNER_FILE ]; then
     convert_module "PyHDFS"
 
     # 运行命令：根据bin下生成的interpreter指定命名文件，替代原python或python3命令 执行
-    cd $RUNNER_DIR 
-    touch eggs/
-    bin/sandbox src/boot.py "$FLINK_DIR/bin/pyflink-stream.sh"
+    $SANDBOX_FILE src/boot.py "$FLINK_DIR/bin/pyflink-stream.sh"
 else
-    echo "ERROR: Environment by file '$RUNNER_FILE' build failed."
+    echo "ERROR: Environment by file '$SANDBOX_FILE' build failed."
 fi
 
 # 统计UV

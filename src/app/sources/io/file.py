@@ -32,8 +32,8 @@ class File(SourceIOBase):
                 self.logger.error("Read position from file '{}' error -> {}".format(self.get_position_path(), err))
 
         return position
-        
-    def restore_hung_up(self, handler, ctx):
+
+    def get_handler(self):
         pass
 
     def mount(self, handler, ctx):

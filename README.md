@@ -1,4 +1,4 @@
-# PyFlink Framework Osteam Base
+# PyFlink Framework OSTeam Base
 This framework base on flink below v1.5, serve for 'oshit team', develop in python3.6。
 It is usually used for multi-dimensional data high concurrency analysis scenarios。
 

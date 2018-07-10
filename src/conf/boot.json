@@ -1,10 +1,10 @@
 [
     {
-        "module": "calc_count.uri",
-        "source_type": "io",
-        "source_driver": "hdfs",
-        "source_conf": "hdfs",
-        "source_key": "operators.restore_Restore",
+        "module": "agg.day",
+        "source_type": "stream",
+        "source_driver": "socket",
+        "source_conf": "socket",
+        "source_key": "operators.calc_count.uri_Uri",
         "sink_type": "io",
         "sink_driver": "file",
         "sink_conf": "file_uri",

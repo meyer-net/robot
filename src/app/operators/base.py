@@ -92,7 +92,8 @@ class Base(SuperBase):
             stream.output()
         else:
             sink = sinks[0]
-            self.get_sink(sink).write_by_stream(stream)
+            sink = self.get_sink(sink)
+            sink.write_by_stream(stream)
 
             for sink in sinks[1:]:
                 stream.add_sink(sink)

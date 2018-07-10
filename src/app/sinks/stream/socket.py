@@ -1,5 +1,6 @@
 # -- coding: UTF-8 
 
+import utils
 from sinks import SinkBase
 
 class Socket(SinkBase):
@@ -7,8 +8,12 @@ class Socket(SinkBase):
     def __init__(self, conf):
         super(Socket, self).__init__(conf)
 
-    def write_by_stream(self, data_stream):
+    def write_by_stream(self, data_stream, **kvs):
         '''
         该函数指示将指定数据流写入至目标处
         '''
-        data_stream.write_to_socket(self._conf["host"], self._conf["port"])
+        args = self._args
+        host = args["host"]
+        port = utils.gen_free_port(args["port"])
+        
+        data_stream.write_to_socket(host, port, self._kvs["schema"])

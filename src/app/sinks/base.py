@@ -10,7 +10,7 @@ class Base(SuperBase):
     def __init__(self, conf):
         super(Base, self).__init__()
         self._conf = conf
-        self._args = []
+        self._args = self._conf
 
     def set_format_args(self, *args):
         '''
@@ -19,15 +19,17 @@ class Base(SuperBase):
         if len(args) == 0:
             args = ["notset"]
 
-        self._args = list(*args)
+        # 获取settings.conf文件中format部分的格式化后的值
+        if "format" in self._conf:
+            _formated = self._conf["format"].format(*args)
+            self._args = dict(self._conf, formated=_formated)
 
-    def get_format_val(self):
+    def set_stream_args(self, **kvs):
         '''
-        获取settings.conf文件中format部分的格式化后的值
+        设置write_by_stream下调用时参数
         '''
-        args = self._args
-        return self._conf["format"].format(*args)
-
+        self._kvs = dict(kvs)
+        
     @abstractmethod
     def write_by_stream(self, data_stream):
         '''

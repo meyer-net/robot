@@ -12,6 +12,18 @@
         "parallelism": 1
     },
     {
+        "module": "calc_count.uri",
+        "source_type": "io",
+        "source_driver": "hdfs",
+        "source_conf": "hdfs",
+        "source_key": "operators.restore_Restore",
+        "sink_type": "stream",
+        "sink_driver": "socket",
+        "sink_conf": "socket",
+        "parallelism": 1,
+        "delay": 3000
+    },
+    {
         "module": "calc_count.ip",
         "source_type": "io",
         "source_driver": "file",

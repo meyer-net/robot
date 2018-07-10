@@ -6,7 +6,7 @@ from sources import SourceBase
 class Kafka(SourceBase):
     '''初始化构造函数'''
     def __init__(self, conf):
-        super(kafka, self).__init__(conf)
+        super(Kafka, self).__init__(conf)
         
     def get_position_key(self):
         pass

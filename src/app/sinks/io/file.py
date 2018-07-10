@@ -6,8 +6,6 @@ import shutil
 
 from sinks import SinkBase
 
-from org.apache.flink.core.fs.FileSystem import WriteMode
-
 class File(SinkBase):
     '''初始化构造函数'''
     def __init__(self, conf):
@@ -18,10 +16,12 @@ class File(SinkBase):
         该函数指示将指定数据流写入至目标处
         '''
         # 文件备份，因为每次进程起来，文件都会被重新写入
-        file_path = "{}/{}".format(self._conf["path"], self.get_format_val())
+        args = self._args
+        file_path = "{path}/{formated}".format(**args)
 
         if os.path.exists(file_path):
             bak_path = "{}.{}".format(file_path, int(round(time.time() * 1000)))
             shutil.move(file_path, bak_path)
-
-        data_stream.write_as_text("file://{}".format(file_path), WriteMode.OVERWRITE)
+        
+        data_stream.write_as_text(
+            "file://{}".format(file_path), self._kvs["mode"])

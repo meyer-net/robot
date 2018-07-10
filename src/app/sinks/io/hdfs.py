@@ -1,7 +1,6 @@
 # -- coding: UTF-8 
 
 from sinks import SinkBase
-# import smart_open
 
 class Hdfs(SinkBase):
     '''初始化构造函数'''
@@ -12,15 +11,7 @@ class Hdfs(SinkBase):
         '''
         该函数指示将指定数据流写入至目标处
         '''
-        # 文件备份，因为每次进程起来，文件都会被重新写入
-        # file_path = "{}/{}".format(self._conf["path"], self.get_format_val())
+        args = self._args
+        hdfs_path = "hdfs://{host}:{wport}{path}/{formated}".format(**args)
 
-        # if os.path.exists(file_path):
-        #     bak_path = "{}.{}".format(file_path, int(round(time.time() * 1000)))
-        #     shutil.move(file_path, bak_path)
-
-        args = self._conf
-        args["format"] = self.get_format_val()
-        connect_url = "hdfs://{host}:{wport}{path}/{format}".format(**args)
-
-        data_stream.write_as_text(connect_url)
+        data_stream.write_as_text(hdfs_path, self._kvs["mode"])

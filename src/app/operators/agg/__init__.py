@@ -16,30 +16,8 @@
 # limitations under the License.
 ################################################################################
 
-import socket
-
-from utils.system import Config
-from utils.logger import Logger, Printer
-from utils.string import String
-
-def gen_free_port(port=5000, granularity=1):
-    port = int(port)
-    if port not in range(1024, 65535):
-        raise Exception("input port is should be in range of 1024..65535.")
-    try:
-        skt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        while port <= 65535:
-            try:
-                skt.bind(('', port))
-                addr = skt.getsockname()
-                return addr[1]
-            except IOError:
-                port += granularity
-                if port > 65535:
-                    raise Exception("free port not found.")
-    finally:
-        skt.close()
+from operators.agg.base import Base as OperatorAggBase
 
 __all__ = [
-    'Printer', 'Logger', 'Config', 'String'
+    'OperatorAggBase'
 ]

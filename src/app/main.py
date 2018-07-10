@@ -136,7 +136,7 @@ class OperatorEntry(SuperBase):
     def run_main(self, factory, args):
         # 创建算子
         operator = import_class(args.module, args.script)()
-
+        
         # 创建执行环境
         env = factory.get_execution_environment()
 
@@ -148,6 +148,13 @@ class OperatorEntry(SuperBase):
         source_module = boot_conf["module"]
         env_parallelism = boot_conf["parallelism"]
 
+        # 主要用于像sink为socket时，对应的source为socket且并未优先启动的情况。
+        # 端口没有提前开启写入，则会报错。泛指调整启动优先级的情况。
+        if "delay" in boot_conf:
+            boot_delay = int(boot_conf["delay"])
+            self.logger.info("Operator of '{}' delay for {} ms".format(operator.__module__, boot_delay))
+            time.sleep(boot_delay)
+        
         # 内部函数
         def load_class(load_type):
             load_type_name = boot_conf["{}_type".format(load_type)]
@@ -169,6 +176,7 @@ class OperatorEntry(SuperBase):
         data_source.set_conf("ref", operator.__module__)
         
         # 将动态部分依据KEY提前格式化
+        sink = load_class("sink")
         data_source_conf_format = data_source.get_conf("format")
         if data_source_conf_format:
             formated = data_source_conf_format.format(boot_conf_key)
@@ -179,9 +187,9 @@ class OperatorEntry(SuperBase):
         data_generator = Generator(data_source)
 
         # 创建输出适配
-        data_sinks = [load_class("sink"), MarkProcess(data_source)]
+        data_sinks = [sink, MarkProcess(data_source)]
 
-        # 写入日志
+        # 打印日志
         self.logger.info("Work running local at '{}'".format(str(os.path.dirname(os.path.abspath(__file__)))))
         self.logger.info("Work commited to job by '{}'".format(operator.__module__))
 

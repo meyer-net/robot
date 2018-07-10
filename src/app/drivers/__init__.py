@@ -18,8 +18,9 @@
 
 import redis as RedisDriver
 import pyhdfs as HdfsDriver
+import socket as SocketDriver
 # import smart_open as smart_open
 
 __all__ = [
-    'RedisDriver', 'HdfsDriver'
+    'RedisDriver', 'HdfsDriver', 'SocketDriver'
 ]

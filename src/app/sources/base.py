@@ -13,7 +13,9 @@ class Base(SuperBase):
 
     '''读取配置文件内容'''
     def get_conf(self, key):
-        return self._conf[key]
+        if key in self._conf:
+            return self._conf[key]
+        return None
 
     '''设置配置文件内容'''
     def set_conf(self, key, value):

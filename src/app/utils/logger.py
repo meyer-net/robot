@@ -40,7 +40,7 @@ class Logger(object):
         self._logger_handlers = self.get_handlers(log_name)
 
     def get_logger(self, channel="default"):
-        if hasattr(self._loggers, channel):
+        if channel in self._loggers:
             return self._loggers[channel]
 
         logger = LoggerDriver(channel)

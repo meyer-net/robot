@@ -6,7 +6,6 @@ from operators.agg import OperatorAggBase
 
 class Day(OperatorAggBase):
   '''初始化构造函数'''
-
   def __init__(self):
     super(Day, self).__init__()
 

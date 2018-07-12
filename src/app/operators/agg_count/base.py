@@ -1,5 +1,7 @@
 # -- coding: UTF-8 
 
+import time
+
 from common import SuperBase
 from operators import OperatorBase
 
@@ -13,32 +15,42 @@ from org.apache.flink.streaming.api.windowing.time.Time import milliseconds
 from org.apache.flink.core.fs.FileSystem import WriteMode
 
 class FlatMap(FlatMapFunction, SuperBase):
-    def __init__(self, func_get_group_key):
+    def __init__(self, operator):
         super(FlatMap, self).__init__()
-        self._func_get_group_key = func_get_group_key
+        self._operator = operator
 
     def flatMap(self, value, collector):
         try:
-            count_key = tuple(value.lstrip('(').rstrip(')').split(","))
-            collector.collect((count_key[0], self._func_get_group_key()))
+            # merge_list = [self._operator.get_agg_key()]
+            value_list = value.lstrip('[').rstrip(']').lstrip('(').rstrip(')').split(",")
+            time_stamp = float(value_list[2].strip())
+            time_array = time.localtime(time_stamp)
+
+            value_list[0] = int(value_list[0])
+            value_list[1] = value_list[1].decode()
+            value_list[2] = time.strftime("%Y-%m-%d", time_array)
+
+            tuple_collect = tuple(value_list)
+            collector.collect(tuple_collect)
+
         except ValueError as err:
             self.logger.error(err)
 
 # KeyBy之后，实际上按照需要的维度进行分组了，不会出现重复维度的数据
 class KeyBy(KeySelector):
     def getKey(self, input):
-        return input[1]
+        return input[2]
 
 # KeyBy之后，依据FlatMap返回的类型为Tuple的值后执行的运算
 class Reduce(ReduceFunction):
     def reduce(self, prev, this):
         # 此处 prev_key = this_key
-        prev_count, prev_key = prev
-        this_count, this_key = this
+        prev_count, prev_key, prev_receive_time = prev
+        this_count, this_key, this_receive_time = this
             
         reduce_count = prev_count + this_count
         
-        return (reduce_count, this_key)
+        return (reduce_count, this_key, this_receive_time)
 
 class Base(OperatorBase):
     '''
@@ -49,7 +61,7 @@ class Base(OperatorBase):
         super(Base, self).__init__()
 
     @abstractmethod
-    def get_group_key(self):
+    def get_agg_key(self):
         '''
         分组依据KEY，子类必须实现
         '''
@@ -59,15 +71,13 @@ class Base(OperatorBase):
         '''
         流逻辑，必须实现
         '''
-        return stream.flat_map(FlatMap(self.get_group_key)) \
+        return stream.flat_map(FlatMap(self)) \
             .key_by(KeyBy()) \
-            .time_window(milliseconds(50)) \
+            .time_window(milliseconds(1000)) \
             .reduce(Reduce())
 
     def get_sink(self, sink):
         '''
         流逻辑，必须实现
         '''
-        sink.set_format_args(["{}_{}".format(self.__module__, self.__class__.__name__)])
-        sink.set_stream_args(mode=WriteMode.OVERWRITE)
         return sink

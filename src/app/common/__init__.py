@@ -16,8 +16,8 @@
 # limitations under the License.
 ################################################################################
 
-from common.base import Base as SuperBase
+from common.base import Base as SuperBase, FlowBase
 
 __all__ = [
-    'SuperBase'
+    'SuperBase', 'FlowBase'
 ]

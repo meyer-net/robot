@@ -1,13 +1,57 @@
 [
     {
-        "module": "agg.day",
+        "module": "restore",
+        "source_type": "stream",
+        "source_driver": "redis",
+        "source_conf": "redis",
+        "source_key": "buffer->topic{binlog_fa}mq_keys",
+        "sink_type": "io",
+        "sink_driver": "hdfs",
+        "sink_conf": "hdfs",
+        "parallelism": 1
+    }, 
+    {
+        "module": "calc_count.uri",
+        "source_type": "io",
+        "source_driver": "hdfs",
+        "source_conf": "hdfs",
+        "source_key": "operators.restore_Restore",
+        "sink_type": "stream",
+        "sink_driver": "socket",
+        "sink_conf": "socket",
+        "parallelism": 1,
+        "boot_delay": 120
+    }, 
+    {
+        "module": "agg_count.day",
         "source_type": "stream",
         "source_driver": "socket",
         "source_conf": "socket",
-        "source_key": "operators.calc_count.uri_Uri",
         "sink_type": "io",
         "sink_driver": "file",
-        "sink_conf": "file_uri",
+        "sink_conf": "file_agg_count",
+        "parallelism": 1
+    },
+    {
+        "module": "calc_count.ip",
+        "source_type": "io",
+        "source_driver": "hdfs",
+        "source_conf": "hdfs",
+        "source_key": "operators.restore_Restore",
+        "sink_type": "io",
+        "sink_driver": "file",
+        "sink_conf": "file_calc_count",
+        "parallelism": 1
+    },
+    {
+        "module": "agg_count.day",
+        "source_type": "io",
+        "source_driver": "file",
+        "source_conf": "file_calc_count",
+        "source_key": "operators.calc_count.ip_Ip",
+        "sink_type": "io",
+        "sink_driver": "file",
+        "sink_conf": "file_agg_count",
         "parallelism": 1
     }
 ]

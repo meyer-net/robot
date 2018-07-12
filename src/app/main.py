@@ -146,17 +146,24 @@ class OperatorEntry(SuperBase):
 
         # 合并 boot_conf 内容
         source_module = boot_conf["module"]
+        source_key = boot_conf.get("source_key")
         env_parallelism = boot_conf["parallelism"]
 
         # 主要用于像sink为socket时，对应的source为socket且并未优先启动的情况。
         # 端口没有提前开启写入，则会报错。泛指调整启动优先级的情况。
-        if "delay" in boot_conf:
-            boot_delay = int(boot_conf["delay"])
-            self.logger.info("Operator of '{}' delay for {} ms".format(operator.__module__, boot_delay))
+        if "boot_delay" in boot_conf:
+            boot_delay = int(boot_conf["boot_delay"])
+            self.logger.warning("Operator of '{}' delay for {} seconds".format(operator.__module__, boot_delay))
             time.sleep(boot_delay)
         
+        # 依据环境变化计算出来的配置
+        dynamic_conf = {
+            "source_key": source_key,
+            "ref": operator.__module__
+        }
+
         # 内部函数
-        def load_class(load_type):
+        def load_flow_class(load_type):
             load_type_name = boot_conf["{}_type".format(load_type)]
             load_type_driver_name = boot_conf["{}_driver".format(load_type)]
             load_type_conf_name = boot_conf["{}_conf".format(load_type)]
@@ -164,23 +171,20 @@ class OperatorEntry(SuperBase):
 
             if load_type_conf == None:
                 raise Exception("Cannot find section of '{}' from the settings.conf case when load the type of '{}'".format(load_type_conf_name, load_type))
-            
+
+            load_type_conf = dict(dynamic_conf, **load_type_conf)
             instance = import_class("{}s".format(load_type), "{}.{}".format(load_type_name, load_type_driver_name))(load_type_conf)
             self.logger.info("Operator [{}] -> [{}] = '{}' & [config] = '{}'".format(operator.__module__, load_type, instance.__module__, load_type_conf))
             return instance
-        
+
         # 创建数据源适配
-        data_source = load_class("source")
-        boot_conf_key = boot_conf.get("source_key")
-        data_source.set_conf("key", boot_conf_key)
-        data_source.set_conf("ref", operator.__module__)
+        data_source = load_flow_class("source")
+        data_source.set_format_args(source_key)
         
         # 将动态部分依据KEY提前格式化
-        sink = load_class("sink")
-        data_source_conf_format = data_source.get_conf("format")
-        if data_source_conf_format:
-            formated = data_source_conf_format.format(boot_conf_key)
-            data_source.set_conf("formated", formated)
+        sink = load_flow_class("sink")
+        sink.set_format_args("{}_{}".format(
+            operator.__module__, operator.__class__.__name__))
 
 
         # 数据源包裹器

@@ -19,5 +19,4 @@ class Restore(OperatorBase):
         '''
         流逻辑，必须实现
         '''
-        sink.set_format_args(["{}_{}".format(self.__module__, self.__class__.__name__)])
         return sink

@@ -13,7 +13,7 @@ class Hdfs(SourceIOBase):
         super(Hdfs, self).__init__(conf)
 
     def set_position(self, handler, position):
-        print("set position {}".format(str(position)))
+        self.logger.debug("set position {}".format(str(position)))
         args = {
             "path": self.get_position_path(),
             "data": str(position),
@@ -37,14 +37,14 @@ class Hdfs(SourceIOBase):
         return position
 
     def get_handler(self):
-        args = self._conf 
+        args = self._args 
         return HdfsDriver.HdfsClient(hosts='{host}:{rport}'.format(**args), user_name='pyflink')
 
     def mount(self, handler, ctx):
         '''
         该函数指示将指定数据流写入至目标处
         '''
-        args = self._conf
+        args = self._args
         read_file = args["formated"]
         ref = args["ref"]
         
@@ -59,7 +59,7 @@ class Hdfs(SourceIOBase):
         try:
             with closing(handler.open('{path}/{formated}'.format(**args), offset=offset)) as resp:
                 lines = resp.read().split('\n')
-
+                
                 # 多余的一行是换行符，固然 -1
                 lines_len = len(lines) - 1
                 for index in range(lines_len):

@@ -62,7 +62,7 @@ class Reduce(ReduceFunction):
 # 序列化
 class ToStringSchema(SerializationSchema):
     def serialize(self, value):
-        return "[{}, {}]".format(value[0], value[1])
+        return "({}, {}, {})".format(*value)
 
 class Base(OperatorBase):
     '''
@@ -88,6 +88,5 @@ class Base(OperatorBase):
         '''
         流逻辑，必须实现
         '''
-        sink.set_format_args(["{}_{}".format(self.__module__, self.__class__.__name__)])
         sink.set_stream_args(mode=WriteMode.OVERWRITE, schema=ToStringSchema())
         return sink

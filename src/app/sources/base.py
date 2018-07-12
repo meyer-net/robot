@@ -1,25 +1,15 @@
 # -- coding: UTF-8 
 
-from common import SuperBase
+from common import FlowBase
 
 from abc import ABCMeta, abstractmethod, abstractproperty
 
-class Base(SuperBase):
+
+class Base(FlowBase):
     __metaclass__ = ABCMeta
     '''初始化构造函数'''
     def __init__(self, conf):
-        super(Base, self).__init__()
-        self._conf = conf
-
-    '''读取配置文件内容'''
-    def get_conf(self, key):
-        if key in self._conf:
-            return self._conf[key]
-        return None
-
-    '''设置配置文件内容'''
-    def set_conf(self, key, value):
-        self._conf[key] = value
+        super(Base, self).__init__(conf)
 
     '''
     用于标记最后信息的读取位置

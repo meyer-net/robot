@@ -18,7 +18,8 @@
 
 from sources.stream.kafka import Kafka
 from sources.stream.redis import Redis
+from sources.stream.socket import Socket
 
 __all__ = [
-    'Kafka', 'Redis'
+    'Kafka', 'Redis', 'Socket'
 ]

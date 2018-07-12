@@ -22,6 +22,7 @@ import chardet
 from abc import ABCMeta, abstractmethod, abstractproperty
 
 from org.apache.flink.api.common.functions import MapFunction
+from org.apache.flink.core.fs.FileSystem import WriteMode
 
 from common import SuperBase
 
@@ -69,12 +70,6 @@ class Base(SuperBase):
         '''
         raise NotImplementedError  
 
-    def get_data_source(self, data_source):
-        '''
-        留作过滤原始数据源中的信息
-        '''
-        return data_source
-
     def main(self, job_name, env_parallelism, env, source, sinks):
         '''
         主运行函数，分析入口，*不可缺失
@@ -84,7 +79,6 @@ class Base(SuperBase):
 
         #env对象可以完成流式计算的功能。包括
         #2：接入逻辑流
-        # self.get_data_source(source.get_data_source())
         stream = env.create_python_source(source)
         stream = self.get_stream(stream)
         
@@ -92,12 +86,12 @@ class Base(SuperBase):
             stream.output()
         else:
             sink = sinks[0]
+            sink.set_stream_args(mode=WriteMode.OVERWRITE)
             sink = self.get_sink(sink)
             sink.write_by_stream(stream)
 
             for sink in sinks[1:]:
                 stream.add_sink(sink)
             
-
         #3：启动任务
         env.execute("Py-Module '{}'".format(job_name))

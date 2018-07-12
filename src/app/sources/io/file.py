@@ -41,13 +41,12 @@ class File(SourceIOBase):
         该函数指示将指定数据流写入至目标处
         '''
         # 获取配置信息
-        read_name = self._conf["key"]
-        path = self._conf["path"]
-        ref = self._conf["ref"]
+        args = self._args
+        ref = args["ref"]
         
         # 读路径
-        read_file = self._conf["format"].format(read_name)
-        read_path = "{}/{}".format(path, read_file)
+        read_file = args["formated"]
+        read_path = "{path}/{formated}".format(**args)
         if not os.access(read_path, os.F_OK):
             return
 
@@ -77,4 +76,4 @@ class File(SourceIOBase):
         
         return line_index
         # ctx.collect(element)
-        # ctx.read_text("file://{}/{}".format(self._conf["path"], self.get_format_val()), WriteMode.OVERWRITE)
+        # ctx.read_text("file://{}/{}".format(args["path"], self.get_format_val()), WriteMode.OVERWRITE)

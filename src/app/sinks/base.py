@@ -1,28 +1,14 @@
 # -- coding: UTF-8 
 
-from common import SuperBase
+from common import FlowBase
 
 from abc import ABCMeta, abstractmethod, abstractproperty
 
-class Base(SuperBase):
+class Base(FlowBase):
     __metaclass__ = ABCMeta
     '''初始化构造函数'''
     def __init__(self, conf):
-        super(Base, self).__init__()
-        self._conf = conf
-        self._args = self._conf
-
-    def set_format_args(self, *args):
-        '''
-        设置settings.conf文件中format部分的格式化参数
-        '''
-        if len(args) == 0:
-            args = ["notset"]
-
-        # 获取settings.conf文件中format部分的格式化后的值
-        if "format" in self._conf:
-            _formated = self._conf["format"].format(*args)
-            self._args = dict(self._conf, formated=_formated)
+        super(Base, self).__init__(conf)
 
     def set_stream_args(self, **kvs):
         '''

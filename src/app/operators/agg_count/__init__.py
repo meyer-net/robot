@@ -16,8 +16,8 @@
 # limitations under the License.
 ################################################################################
 
-from operators.agg.base import Base as OperatorAggBase
+from operators.agg_count.base import Base as OperatorAggCountBase
 
 __all__ = [
-    'OperatorAggBase'
+    'OperatorAggCountBase'
 ]

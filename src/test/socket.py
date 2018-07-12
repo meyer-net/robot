@@ -46,4 +46,4 @@ class SocketStringReader(threading.Thread):
         serversocket.close()
 
 if __name__ == '__main__':
-        SocketStringReader('127.0.0.1', 5432, 100).start()
+        SocketStringReader('127.0.0.1', 54321, 100).start()

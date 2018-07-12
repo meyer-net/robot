@@ -1,5 +1,5 @@
-# Rebot - A PyFlink Framework Serve For OSTeam
-Rebot based on flink below v1.5, develop in python3.6。
+# Robot - A PyFlink Framework Serve For OSTeam
+Robot based on flink below v1.5, develop in python3.6。
 It is usually used for multi-dimensional data high concurrency analysis scenarios。
 
 - setup step 

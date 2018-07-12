@@ -1,10 +1,10 @@
-# PyFlink Framework OSTeam Base
-This framework base on flink below v1.5, serve for 'oshit team', develop in python3.6。
+# Rebot - A PyFlink Framework Serve For OSTeam
+Rebot based on flink below v1.5, develop in python3.6。
 It is usually used for multi-dimensional data high concurrency analysis scenarios。
 
 - setup step 
 ```
-first-boot:
+init&boot:
 {
     vim build.sh //edit your flink setup path
     chmod +x build.sh
@@ -13,7 +13,8 @@ first-boot:
 
 start-boot:
 {
-    $SANDBOX_FILE src/boot.py "$FLINK_DIR/bin/pyflink-stream.sh"
+    cd $PROJECT_DIR
+    bin/sandbox src/boot.py "$FLINK_DIR/bin/pyflink-stream.sh"
 }
 
 build-env:

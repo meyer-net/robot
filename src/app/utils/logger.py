@@ -35,6 +35,8 @@ class Logger(object):
     '''日志操作'''
     def __init__(self, log_name="default"):
         super(Logger, self).__init__()
+        self._pid = os.getpid()
+        self._ppid = os.getppid()
 
         self._loggers = {}
         self._logger_handlers = self.get_handlers(log_name)
@@ -67,7 +69,9 @@ class Logger(object):
                 func_name = record.func_name,                    # 函数名
                 lineno = record.lineno,                          # 行号
                 msg = record.message,                            # 日志内容
-                channel = record.channel                         # 通道
+                channel = record.channel,                        # 通道
+                pid = self._pid,
+                ppid = self._ppid
             )
 
             return log

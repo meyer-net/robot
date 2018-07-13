@@ -8,6 +8,7 @@ from drivers import RedisDriver
 
 from store.cache import StoreCacheBase
 
+# netstat -an | grep 6379 |wc -l
 class Redis(StoreCacheBase):
     def __init__(self, host, port):
         '''初始化构造函数'''

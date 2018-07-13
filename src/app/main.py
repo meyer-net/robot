@@ -63,8 +63,9 @@ def import_class(module_base_name, script_name):
 数据源
 '''
 class Generator(SourceFunction, SuperBase):
-    def __init__(self, data_source):
+    def __init__(self, operator_name, data_source):
         self._running = True
+        self._operator_name = operator_name
         self._data_source = data_source
 
     def get_data_source(self):
@@ -88,7 +89,7 @@ class Generator(SourceFunction, SuperBase):
                     wait_seconds = wait_seconds_default
                     data_source.set_position(data_source_handler, position)
                 else:
-                    self.logger.info("Ends by current mount, worker will delay for '{}s'".format(wait_seconds))
+                    self.logger.info("Module '{}' Ends by current mount, worker will delay for '{}s'".format(self._operator_name, wait_seconds))
                     time.sleep(wait_seconds)
                     wait_seconds = wait_seconds * 2
 
@@ -145,14 +146,14 @@ class OperatorEntry(SuperBase):
         boot_conf = settings_conf["boot_conf"]
 
         # 合并 boot_conf 内容
-        source_module = boot_conf["module"]
+        boot_name = boot_conf.get("name", None)
         source_key = boot_conf.get("source_key")
-        env_parallelism = boot_conf["parallelism"]
+        env_parallelism = boot_conf.get("parallelism")
 
         # 主要用于像sink为socket时，对应的source为socket且并未优先启动的情况。
         # 端口没有提前开启写入，则会报错。泛指调整启动优先级的情况。
         if "boot_delay" in boot_conf:
-            boot_delay = int(boot_conf["boot_delay"])
+            boot_delay = int(boot_conf.get("boot_delay"))
             self.logger.warning("Operator of '{}' delay for {} seconds".format(operator.__module__, boot_delay))
             time.sleep(boot_delay)
         
@@ -164,9 +165,9 @@ class OperatorEntry(SuperBase):
 
         # 内部函数
         def load_flow_class(load_type):
-            load_type_name = boot_conf["{}_type".format(load_type)]
-            load_type_driver_name = boot_conf["{}_driver".format(load_type)]
-            load_type_conf_name = boot_conf["{}_conf".format(load_type)]
+            load_type_name = boot_conf.get("{}_type".format(load_type))
+            load_type_driver_name = boot_conf.get("{}_driver".format(load_type))
+            load_type_conf_name = boot_conf.get("{}_conf".format(load_type))
             load_type_conf = settings_conf.get(load_type_conf_name)
 
             if load_type_conf == None:
@@ -182,23 +183,25 @@ class OperatorEntry(SuperBase):
         data_source.set_format_args(source_key)
         
         # 将动态部分依据KEY提前格式化
+        # 注意：同一个模块运算会出现相同运算的SINK，这时候就得显示什么sink_key
         sink = load_flow_class("sink")
-        sink.set_format_args("{}_{}".format(
-            operator.__module__, operator.__class__.__name__))
+        sink.set_format_args(boot_conf.get("sink_key", "{}_{}".format(
+            operator.__module__, operator.__class__.__name__)))
 
 
         # 数据源包裹器
-        data_generator = Generator(data_source)
+        data_generator = Generator(operator.__module__, data_source)
 
         # 创建输出适配
         data_sinks = [sink, MarkProcess(data_source)]
 
         # 打印日志
-        self.logger.info("Work running local at '{}'".format(str(os.path.dirname(os.path.abspath(__file__)))))
-        self.logger.info("Work commited to job by '{}'".format(operator.__module__))
+        self.logger.info("Worker running local at '{}'".format(str(os.path.dirname(os.path.abspath(__file__)))))
+        self.logger.info("Worker commited to job '{}' by '{}'".format(boot_name, operator.__module__))
 
         # 动态运行算子
-        operator.main(source_module, env_parallelism, env, data_generator, data_sinks)
+        operator.main(boot_name, env_parallelism,
+                      env, data_generator, data_sinks)
 
 '''
 Flink 主运行函数

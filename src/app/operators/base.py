@@ -94,4 +94,8 @@ class Base(SuperBase):
                 stream.add_sink(sink)
             
         #3：启动任务
-        env.execute("Py-Module '{}'".format(job_name))
+        execute_name = "Py-Module '{}'".format(self.__module__)
+        if job_name:
+            execute_name = "Py-Job '{}'".format(job_name)
+
+        env.execute(execute_name)

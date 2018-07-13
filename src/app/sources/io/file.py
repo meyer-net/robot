@@ -2,6 +2,8 @@
 
 import os
 
+from contextlib import closing
+
 from sources.io import SourceIOBase
 
 class File(SourceIOBase):
@@ -21,15 +23,15 @@ class File(SourceIOBase):
         
     def get_position(self, handler):
         position = 0
-        with closing(open(self.get_position_path(), "r")) as read_open:
-            try:
+        try:
+            with closing(open(self.get_position_path(), "r")) as read_open:
                 read_open.seek(0)
                 line_text = read_open.readline().strip()
                 position = int(line_text or 0)
-            except IOError as err:
-                self.set_position(0)
-            except Exception as err:
-                self.logger.error("Read position from file '{}' error -> {}".format(self.get_position_path(), err))
+        except IOError as err:
+            self.set_position(handler, 0)
+        except Exception as err:
+            self.logger.error("Read position from file '{}' error -> {}".format(self.get_position_path(), err))
 
         return position
 

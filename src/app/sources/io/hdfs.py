@@ -5,6 +5,7 @@
 
 from sources.io import SourceIOBase
 from drivers import HdfsDriver
+
 from contextlib import closing
 
 class Hdfs(SourceIOBase):
@@ -62,6 +63,7 @@ class Hdfs(SourceIOBase):
                 
                 # 多余的一行是换行符，固然 -1
                 lines_len = len(lines) - 1
+                
                 for index in range(lines_len):
                     line = lines[index]                        # 依次读取每行  
                     line_strip = line.strip()

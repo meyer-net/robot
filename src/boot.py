@@ -4,6 +4,8 @@ import os
 import sys
 import json
 
+from contextlib import closing
+
 ENV_ROOT = str(os.path.dirname(os.path.abspath(__file__)))
 APP_ROOT = "{}/app".format(ENV_ROOT)
 sys.path.append(ENV_ROOT)
@@ -66,6 +68,19 @@ def join_job(settings, boot_operator, packages):
     
     os.system(cmd)
 
+'''
+动态控制运行时部分变量
+'''
+def configure_runtime():
+    runtime_file_path = "{}/runtime/environment.py".format(APP_ROOT)
+
+    with closing(open(runtime_file_path, "w")) as write_open:
+        write_open.write("# -- coding: UTF-8\n")
+        write_open.write("ENV_ROOT = '{}'\n".format(ENV_ROOT))
+        write_open.write("LOGGER_CONF = {}\n".format(
+            json.dumps(settings_conf["logger"])))
+        write_open.flush()
+
 if __name__ == '__main__':
     PY_FLINK = sys.argv[1]
     PACKAGES = sys.argv[2]
@@ -79,29 +94,19 @@ if __name__ == '__main__':
     #加载启动器信息
     boot_conf = conf.load_boot()
     
-    # 写入runtime运行时数据
-    runtime_file_path = "{}/runtime/environment.py".format(APP_ROOT)
-    write_open = open(runtime_file_path, "w")
-    
-    try:
-        write_open.write("# -- coding: UTF-8\n")
-        write_open.write("ENV_ROOT = '{}'\n".format(ENV_ROOT))
-        write_open.write("LOGGER_CONF = {}\n".format(json.dumps(settings_conf["logger"])))
-        write_open.flush()
-    except Exception as err:
-        logger.error("Runtime file '{}' write error: '{}'".format(runtime_file_path, err))
-    finally:
-        if write_open != None:
-            write_open.close()
+    # 配置runtime运行时数据
+    configure_runtime()
     
     packages = load_packages()
-    for operator in boot_conf:
-        module = operator["module"].strip()
+    for opr_boot_conf in boot_conf:
+        name = opr_boot_conf["name"].strip()
+        module = opr_boot_conf["module"].strip()
         logger.info("CHECKING FOR OPERATOR-MODULE '{}'".format(module))
-        settings_conf["boot_conf"] = operator
+        settings_conf["boot_conf"] = opr_boot_conf
         settings_conf_json = json.dumps(settings_conf)
         join_job(settings_conf_json, module, packages)
-        logger.info("JOB '{}' ALREADY SUBMIT, AFTER A MOMENT WILL START".format(module))
+        logger.info(
+            "BOOTER '{}' USE MODULE '{}' ALREADY SUBMIT, AFTER A MOMENT WILL START".format(name, module))
         logger.empty('+--------------------------------------------------------------------------------------------------------+')
 
 #启动命令：bin/sandbox src/boot.py '/usr/local/opt/flink/bin/pyflink-stream.sh'

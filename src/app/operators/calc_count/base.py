@@ -31,7 +31,7 @@ class FlatMap(FlatMapFunction, SuperBase):
             # delayTime = current_time - int(jsv["ReceiveTime"])
             
             #collect参数中的*tuple为数组类型，按参数的位置，提供给下游keyby、sum等函数运算
-            collector.collect((1, group_key, receive_time)) 
+            collector.collect((int(1), group_key, receive_time))
         except ValueError as err:
             self.logger.error(err)
 
@@ -90,3 +90,6 @@ class Base(OperatorBase):
         '''
         sink.set_stream_args(mode=WriteMode.OVERWRITE, schema=ToStringSchema())
         return sink
+
+# 测试运算结果
+# cat operators.calc_count.ip_Ip.output | cut -d "," -f 1 | grep -o '[0-9]*' | awk -F'\t' -v sum=0 '{sum+=$1} END{print sum}'

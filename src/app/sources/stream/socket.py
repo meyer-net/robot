@@ -33,5 +33,7 @@ class Socket(SourceBase):
             element = bytes.decode(data)
             self.logger.debug("Collect element '{}'".format(element))
             ctx.collect(element)
+            
+            return element
 
-        return element
+        return None

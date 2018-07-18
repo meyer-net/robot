@@ -37,6 +37,5 @@ class Socket(SinkBase):
                 self.logger.error(
                     "Socket connect to '{}:{}' failed, wait for {}s then retry".format(host, port, wait_secs))
                 time.sleep(wait_secs)
-                wait_secs = wait_secs * 2
         
         data_stream.write_to_socket(host, port, self._kvs["schema"])

@@ -1,5 +1,7 @@
 # -- coding: UTF-8 
 
+# API文档：https://ci.apache.org/projects/flink/flink-docs-release-1.5/dev/stream/python.html#data-sinks
+
 import sys
 import os
 import time
@@ -222,5 +224,3 @@ def main(factory):
 
     # 操作器驱动入口
     OperatorEntry(args.script).run_main(factory, args)
-
-#pyenv3 的回顾

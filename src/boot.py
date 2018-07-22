@@ -109,4 +109,5 @@ if __name__ == '__main__':
             "BOOTER '{}' USE MODULE '{}' ALREADY SUBMIT, AFTER A MOMENT WILL START".format(name, module))
         logger.empty('+--------------------------------------------------------------------------------------------------------+')
 
+#类似 { python3 -m venv pyenv3 && source $PYENV3_DIR/bin/activate } 这种创建一个python3名为pyenv3的虚拟环境也可以完成该功能，但管理相对比较分散。
 #启动命令：bin/sandbox src/boot.py '/usr/local/opt/flink/bin/pyflink-stream.sh'

@@ -52,6 +52,10 @@ if [ -f $SANDBOX_FILE ]; then
     convert_module "bz2file"
     convert_module "PyHDFS"
 
+    # DJANGO 的包输出到 UWSGI配置中
+    # DJANGO + UWSGI + NGX：https://www.cnblogs.com/chenice/p/6921727.html + https://www.cnblogs.com/Erick-L/p/7066455.html
+    # cat $SANDBOX_FILE | head -n $PATH_END_LINE | tail -n +1 | awk -F"'" '{print $2}' | uniq | grep -v '^$' | sed "s@$ENV_DIR@pythonpath = $ENV_DIR@g" | xargs -d "\r\n" echo >> src/*.ini
+
     # 运行命令：根据bin下生成的interpreter指定命名文件，替代原python或python3命令 执行
     $SANDBOX_FILE src/boot.py "$FLINK_DIR/bin/pyflink-stream.sh"
 else
